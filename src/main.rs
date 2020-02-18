@@ -2,7 +2,6 @@ use std::io;
 use std::{env, process, thread};
 use std::net::{IpAddr, TcpStream};
 use std::str::FromStr;
-use std::env::args;
 use std::sync::mpsc::{channel, Sender};
 use std::io::Write;
 
@@ -39,7 +38,7 @@ impl Arguments {
                      Ok(s) => s,
                      Err(_) => return Err("not valid ip addres")
                  };
-                 let threads = match args[3].parse::<u16>(){
+                 let threads = match args[2].parse::<u16>(){
                     Ok(s)   => s,
                     Err(_)  => return Err("failed to parse")
                 };
@@ -74,6 +73,10 @@ fn scan(tx: Sender<u16>, start_port: u16, ipadr: IpAddr, num_threads: u16){
 fn main() {
      let cl : Vec<String> =  env::args().collect();
      let program = cl[0].clone();
+     for str in &cl{
+        println!("{}",&str);
+     }
+
      let arguments = Arguments::new(&cl).unwrap_or_else( |err|{
             if err.contains("help"){
                 process::exit(0);
