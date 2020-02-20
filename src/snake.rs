@@ -4,9 +4,11 @@ use piston_window::types::Color;
 
 use draw::draw_block;
 use crate::draw::draw_block;
+use crate::main;
 
 const SHAKE_COLOR: Color = [0.00, 0.80, 0.00, 1.00];
 
+#[derive(Copy, Clone, PartialEq)]
 pub enum Direction {
     Up,
     Down,
@@ -25,7 +27,7 @@ impl Direction {
         }
     }
 }
-
+#[derive(Debug, Clone)]
 struct Block {
     x: i32,
     y: i32
@@ -90,6 +92,47 @@ impl Snake {
         let rm_block = self.body.pop_back().unwrap();
         self.tail           = Some(rm_block);
     }
+
+    pub fn next_direction(&self) -> Direction {
+        self.direction
+    }
+
+    pub fn next_head(&self, new_dir: Option<Direction>) -> (i32, i32){
+        let (curp_x, curp_y) = self.head_position();
+
+        let mut current_direction =  self.direction;
+        match new_dir {
+            Some(d) => current_direction = d,
+            None             => {}
+        }
+
+        match current_direction {
+            Direction:Up   => (curp_x, curp_y + 1),
+            Direction:Down => (curp_x, curp_y - 1),
+            Direction:Left => (curp_x - 1, curp_y),
+            Direction:Right=> (curp_x + 1, curp_y)
+        }
+    }
+
+    pub fn restore_tail(&mut self){
+        let tail= self.tail.unwrap();
+        self.body.push_back(tail);
+    }
+
+    pub fn overlap_tail(&self, x: i32, y: i32) -> bool{
+        let mut ch = 0;
+        for block in &self.body{
+            if x == block.x && y == block.y{
+                return true;
+            }
+            ch += 1;
+            if ch == self.body.len() - 1{
+                break;
+            }
+        }
+        return false;
+    }
+
 }
 
 
